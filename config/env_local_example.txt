@@ -1,0 +1,170 @@
+<?php
+// config/env_local.php - Archivo para probar la conexión desde la carpeta config
+// ⚠️ IMPORTANTE: ELIMINAR ESTE ARCHIVO EN PRODUCCIÓN POR SEGURIDAD
+
+echo "<h2>🔧 Probando conexión a la base de datos...</h2>";
+echo "<hr>";
+
+try {
+    // Incluir configuración (mismo directorio, solo el nombre del archivo)
+    require_once 'database.php';
+    
+    echo "✅ <strong>Conexión exitosa a la base de datos!</strong><br><br>";
+    
+    // Probar consulta básica
+    echo "<h3>📊 Información de la base de datos:</h3>";
+    
+    // Mostrar nombre de la BD
+    $stmt = $pdo->query("SELECT DATABASE() as db_name");
+    $result = $stmt->fetch();
+    echo "🗄️ Base de datos actual: <strong>" . $result['db_name'] . "</strong><br>";
+    
+    // Mostrar versión de MySQL
+    $stmt = $pdo->query("SELECT VERSION() as version");
+    $result = $stmt->fetch();
+    echo "🔢 Versión de MySQL: <strong>" . $result['version'] . "</strong><br><br>";
+    
+    // Listar tablas existentes
+    echo "<h3>📋 Tablas en la base de datos:</h3>";
+    $stmt = $pdo->query("SHOW TABLES");
+    $tables = $stmt->fetchAll();
+    
+    if (count($tables) > 0) {
+        echo "<ul>";
+        foreach ($tables as $table) {
+            $tableName = array_values($table)[0];
+            echo "<li>📁 " . $tableName;
+            
+            // Contar registros en cada tabla
+            try {
+                $countStmt = $pdo->query("SELECT COUNT(*) as total FROM `$tableName`");
+                $count = $countStmt->fetch();
+                echo " (" . $count['total'] . " registros)";
+            } catch (Exception $e) {
+                echo " (error al contar)";
+            }
+            echo "</li>";
+        }
+        echo "</ul>";
+    } else {
+        echo "⚠️ No hay tablas en la base de datos. Asegúrate de haber ejecutado el script SQL.";
+    }
+    
+    // Probar usuarios si la tabla existe
+    echo "<br><h3>👥 Usuarios en el sistema:</h3>";
+    try {
+        $stmt = $pdo->query("SELECT id, nombre, correo, tipo FROM usuarios");
+        $usuarios = $stmt->fetchAll();
+        
+        if (count($usuarios) > 0) {
+            echo "<table border='1' style='border-collapse: collapse; width: 100%; margin: 10px 0;'>";
+            echo "<tr style='background-color: #f0f0f0;'>";
+            echo "<th style='padding: 8px;'>ID</th>";
+            echo "<th style='padding: 8px;'>Nombre</th>";
+            echo "<th style='padding: 8px;'>Correo</th>";
+            echo "<th style='padding: 8px;'>Tipo</th>";
+            echo "</tr>";
+            
+            foreach ($usuarios as $usuario) {
+                echo "<tr>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($usuario['id']) . "</td>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($usuario['nombre']) . "</td>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($usuario['correo']) . "</td>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($usuario['tipo']) . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+            
+            echo "<div style='background: #e8f5e8; padding: 10px; margin: 10px 0; border-radius: 5px;'>";
+            echo "<strong>📝 Credenciales para login:</strong><br>";
+            echo "• admin@gestion.com - admin123<br>";
+            echo "• secretaria@gestion.com - secretaria123";
+            echo "</div>";
+            
+        } else {
+            echo "⚠️ No hay usuarios registrados.";
+        }
+    } catch (Exception $e) {
+        echo "❌ Error al consultar usuarios: " . $e->getMessage();
+        echo "<br>💡 Probablemente necesitas ejecutar el script SQL para crear las tablas.";
+    }
+    
+    // Probar estudiantes si la tabla existe
+    echo "<br><h3>🎓 Estudiantes en el sistema:</h3>";
+    try {
+        $stmt = $pdo->query("SELECT cedula, nombre, apellido FROM estudiantes LIMIT 5");
+        $estudiantes = $stmt->fetchAll();
+        
+        if (count($estudiantes) > 0) {
+            echo "<table border='1' style='border-collapse: collapse; width: 100%; margin: 10px 0;'>";
+            echo "<tr style='background-color: #f0f0f0;'>";
+            echo "<th style='padding: 8px;'>Cédula</th>";
+            echo "<th style='padding: 8px;'>Nombre</th>";
+            echo "<th style='padding: 8px;'>Apellido</th>";
+            echo "</tr>";
+            
+            foreach ($estudiantes as $estudiante) {
+                echo "<tr>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($estudiante['cedula']) . "</td>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($estudiante['nombre']) . "</td>";
+                echo "<td style='padding: 8px;'>" . htmlspecialchars($estudiante['apellido']) . "</td>";
+                echo "</tr>";
+            }
+            echo "</table>";
+        } else {
+            echo "⚠️ No hay estudiantes registrados.";
+        }
+    } catch (Exception $e) {
+        echo "❌ Error al consultar estudiantes: " . $e->getMessage();
+    }
+    
+    // Información del servidor
+    echo "<br><h3>🖥️ Información del servidor:</h3>";
+    echo "• PHP Version: " . phpversion() . "<br>";
+    echo "• Servidor: " . $_SERVER['SERVER_SOFTWARE'] . "<br>";
+    echo "• Host: " . $_SERVER['HTTP_HOST'] . "<br>";
+    echo "• Puerto MySQL configurado: " . $config['port'] . "<br>";
+    
+} catch (PDOException $e) {
+    echo "❌ <strong>Error de conexión:</strong><br>";
+    echo "🔍 Detalles: " . htmlspecialchars($e->getMessage()) . "<br><br>";
+    
+    echo "<h3>🛠️ Posibles soluciones:</h3>";
+    echo "<ul>";
+    echo "<li>✓ Verifica que XAMPP esté ejecutándose</li>";
+    echo "<li>✓ Verifica que MySQL esté iniciado en XAMPP</li>";
+    echo "<li>✓ Confirma que la base de datos 'gestion_estudiantes' existe</li>";
+    echo "<li>✓ Verifica el puerto en config/database.php (línea 15)</li>";
+    echo "<li>✓ Confirma que no hay contraseña para 'root' en XAMPP</li>";
+    echo "<li>✓ Ejecuta el script SQL para crear las tablas</li>";
+    echo "</ul>";
+    
+    echo "<h3>🔧 Pasos para crear la base de datos:</h3>";
+    echo "<ol>";
+    echo "<li>Abre phpMyAdmin en <a href='http://localhost/phpmyadmin' target='_blank'>http://localhost/phpmyadmin</a></li>";
+    echo "<li>Crea una nueva base de datos llamada 'gestion_estudiantes'</li>";
+    echo "<li>Selecciona la base de datos</li>";
+    echo "<li>Ve a la pestaña 'SQL' y ejecuta el script que tienes en sql/database.sql</li>";
+    echo "</ol>";
+    
+} catch (Exception $e) {
+    echo "❌ <strong>Error general:</strong><br>";
+    echo "🔍 Detalles: " . htmlspecialchars($e->getMessage()) . "<br>";
+    echo "💡 Verifica que el archivo 'database.php' exista en la misma carpeta config/.";
+}
+
+echo "<br><hr>";
+echo "<div style='background: #fff3cd; padding: 10px; margin: 10px 0; border-radius: 5px; border-left: 4px solid #ffc107;'>";
+echo "<strong>⚠️ RECORDATORIO DE SEGURIDAD:</strong><br>";
+echo "Una vez que todo funcione correctamente, <strong>ELIMINA</strong> este archivo por seguridad.<br>";
+echo "Este archivo expone información sensible de la base de datos.";
+echo "</div>";
+
+echo "<p><em>📂 Accede a este archivo desde:</em> <strong>http://localhost/gestionestudiantes/config/env_local.php</strong></p>";
+
+// INSTRUCCIONES DE USO:
+// 1. Copiar este archivo a config/env_local.php
+// 2. Asegurarse de que database.php esté configurado correctamente
+// 3. Acceder desde navegador para probar conexión
+// 4. ELIMINAR este archivo antes de subir a producción
+?>
