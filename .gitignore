@@ -1,7 +1,7 @@
 # Archivos de configuración sensibles
-config/env_local.php
-config/env_production.php
-config/database_local.php
+config/backend/env_local.php
+config/backend/env_production.php
+config/backend/database_local.php
 
 # Archivos de sistema
 .DS_Store
