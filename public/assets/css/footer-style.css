@@ -1,0 +1,128 @@
+/* Estilos para el footer */
+
+/* Contenedor principal del footer */
+.footer-fs {
+    background: linear-gradient(to right, #8B0000, #630000);
+    color: rgba(255, 255, 255, 0.9);
+    padding: 3rem 0;
+    margin-top: auto;
+}
+
+.container-fs {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Grid del footer */
+.grid-fs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+/* Secciones del footer */
+.section-fs {
+    margin-bottom: 1.5rem;
+}
+
+.title-fs {
+    color: #FFD700;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #FFD700;
+    padding-bottom: 0.5rem;
+}
+
+/* Enlaces del footer */
+.list-fs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item-fs {
+    margin-bottom: 0.5rem;
+}
+
+.link-fs {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+    padding: 0.2rem 0;
+}
+
+.link-fs:hover {
+    color: #FFD700;
+    transform: translateX(5px);
+    text-decoration: none;
+}
+
+/* Información de contacto */
+.contact-fs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.icon-fs {
+    color: #FFD700;
+    margin-right: 0.8rem;
+    font-size: 1.1rem;
+}
+
+.text-fs {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Copyright */
+.copyright-fs {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+}
+
+/* Redes sociales */
+.social-fs {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-link-fs {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.social-link-fs:hover {
+    color: #FFD700;
+    transform: translateY(-3px);
+}
+
+/* Estilos responsive */
+@media (max-width: 768px) {
+    .grid-fs {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .section-fs {
+        text-align: center;
+    }
+
+    .contact-fs {
+        justify-content: center;
+    }
+
+    .social-fs {
+        justify-content: center;
+    }
+}
