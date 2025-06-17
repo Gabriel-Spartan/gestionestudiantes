@@ -1,21 +1,20 @@
 <?php
 // config/database.php - Configuración para desarrollo y producción
-
-// Detectar si estamos en desarrollo local o producción
-function isLocalEnvironment()
-{
-    $localHosts = ['localhost', '127.0.0.1', '::1'];
-    return in_array($_SERVER['HTTP_HOST'], $localHosts) ||
-        strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
-        strpos($_SERVER['HTTP_HOST'], '.local') !== false;
-}
+// CORREGIDO: Función isLocalEnvironment() removida para evitar duplicación
 
 // Configuración según el entorno
-if (isLocalEnvironment()) {
+$localHosts = ['localhost', '127.0.0.1', '::1', '192.168.2.27', '10.79.17.58'];
+$isLocal = in_array($_SERVER['HTTP_HOST'], $localHosts) ||
+            strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '.local') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '192.168') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '10.79') !== false;
+
+if ($isLocal) {
     // CONFIGURACIÓN PARA DESARROLLO LOCAL (XAMPP)
     $config = [
         'host' => 'localhost',
-        'port' => '3306',  // Tu puerto personalizado de XAMPP
+        'port' => '3306',
         'dbname' => 'gestion_estudiantes',
         'username' => 'root',
         'password' => '',
@@ -47,7 +46,7 @@ try {
     
 } catch (PDOException $e) {
     // En producción, no mostrar detalles del error
-    if (isLocalEnvironment()) {
+    if ($isLocal) {
         die("❌ Error de conexión: " . $e->getMessage());
     } else {
         error_log("Database connection error: " . $e->getMessage());
