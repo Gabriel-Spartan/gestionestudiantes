@@ -234,7 +234,7 @@ const AuthAPI = {
      */
     async logout() {
         try {
-            const response = await api.post(API_CONFIG.endpoints.auth.logout);
+             const response = await fetch('logout.php?logout=1');
             
             // Limpiar información local
             this.clearSessionInfo();
