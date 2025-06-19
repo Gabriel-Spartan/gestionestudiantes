@@ -98,8 +98,8 @@ INSERT INTO configuracion_seguridad (clave, valor, descripcion) VALUES
 -- Por ahora insertamos hashes temporales que se actualizarán
 
 INSERT INTO usuarios (nombre, correo, contrasenia, tipo, estado) VALUES 
-('Administrador General', 'admin@gestion.com', 'temp_admin_hash', 'ADMIN', 'ACTIVO'),
-('Secretaria Principal', 'secretaria@gestion.com', 'temp_secretaria_hash', 'SECRETARIA', 'ACTIVO');
+('Administrador General', 'admin@gestion.com', '$2y$10$alSjnDmFR45UYv9ScLynSeUsXxev177htkQP44OF0BcibEX959cJG', 'ADMIN', 'ACTIVO'),
+('Secretaria Principal', 'secretaria@gestion.com', '$2y$10$alSjnDmFR45UYv9ScLynSeUsXxev177htkQP44OF0BcibEX959cJG', 'SECRETARIA', 'ACTIVO');
 
 -- ============================================================================
 -- INSERTAR ESTUDIANTES DE EJEMPLO

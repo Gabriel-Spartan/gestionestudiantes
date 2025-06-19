@@ -1,0 +1,43 @@
+/* Estilos específicos para header.php */
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+}
+
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.content-wrap {
+    flex: 1;
+}
+
+/* Personalización de elementos básicos */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--uta-primary);
+    margin-bottom: 1rem;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    h2 {
+        font-size: 1.75rem;
+    }
+}
+
+/* Ajustes de accesibilidad */
+:focus {
+    outline: 3px solid var(--uta-accent);
+    outline-offset: 2px;
+}
