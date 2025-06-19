@@ -34,13 +34,13 @@ class LoginForm {
         this.loginBtn = document.getElementById('loginBtn');
         this.togglePasswordBtn = document.getElementById('togglePassword');
         this.messageArea = document.getElementById('messageArea');
-        
+
         this.btnText = this.loginBtn.querySelector('.btn-text');
         this.btnLoading = this.loginBtn.querySelector('.btn-loading');
-        
+
         this.isSubmitting = false;
         this.attemptCount = parseInt(localStorage.getItem('login_attempts') || '0');
-        
+
         this.init();
     }
 
@@ -52,10 +52,10 @@ class LoginForm {
         this.loadRememberedData();
         this.setupQuickFillButtons();
         this.checkLockoutStatus();
-        
+
         // Focus automático en el primer campo vacío
         this.autoFocus();
-        
+
         console.log('[LoginForm] Initialized successfully');
     }
 
@@ -65,27 +65,27 @@ class LoginForm {
     setupEventListeners() {
         // Envío del formulario
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
-        
+
         // Toggle password visibility
         this.togglePasswordBtn.addEventListener('click', () => this.togglePassword());
-        
+
         // Validación en tiempo real
         this.emailInput.addEventListener('input', () => this.validateEmail());
         this.passwordInput.addEventListener('input', () => this.validatePassword());
-        
+
         // Enter key en campos
         this.emailInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.passwordInput.focus();
         });
-        
+
         this.passwordInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.form.requestSubmit();
         });
-        
+
         // Limpiar mensajes cuando el usuario empiece a escribir
         this.emailInput.addEventListener('focus', () => this.clearMessageAfterDelay());
         this.passwordInput.addEventListener('focus', () => this.clearMessageAfterDelay());
-        
+
         // Prevenir copiar/pegar en campo de contraseña (opcional)
         // this.passwordInput.addEventListener('paste', (e) => e.preventDefault());
     }
@@ -96,33 +96,33 @@ class LoginForm {
      */
     async handleSubmit(e) {
         e.preventDefault();
-        
+
         if (this.isSubmitting) return;
-        
+
         // Validaciones previas
         if (!this.validateForm()) return;
-        
+
         // Verificar estado de bloqueo
         if (this.isLockedOut()) {
             this.showLockoutMessage();
             return;
         }
-        
+
         this.setLoadingState(true);
         this.hideMessage();
-        
+
         try {
             const formData = this.getFormData();
-            
+
             // Llamar a la API de login
             const response = await AuthAPI.login(formData.email, formData.password);
-            
+
             if (response.success) {
                 this.handleLoginSuccess(response, formData.remember);
             } else {
                 this.handleLoginError(new Error(response.message));
             }
-            
+
         } catch (error) {
             this.handleLoginError(error);
         } finally {
@@ -137,23 +137,23 @@ class LoginForm {
      */
     handleLoginSuccess(response, remember) {
         console.log('[LoginForm] Login successful:', response.data.user);
-        
+
         // Limpiar contador de intentos
         this.resetAttemptCount();
-        
+
         // Manejar "recordar sesión"
         if (remember) {
             this.saveRememberData(response.data.user.correo);
         } else {
             this.clearRememberData();
         }
-        
+
         // Mostrar mensaje de éxito
         this.showMessage(
-            `¡Bienvenido, ${response.data.user.nombre}!`, 
+            `¡Bienvenido, ${response.data.user.nombre}!`,
             'success'
         );
-        
+
         // Redirigir después de un delay
         setTimeout(() => {
             window.location.href = 'dashboard.php';
@@ -166,35 +166,35 @@ class LoginForm {
      */
     handleLoginError(error) {
         console.error('[LoginForm] Login failed:', error);
-        
+
         // Incrementar contador de intentos
         this.incrementAttemptCount();
-        
+
         let errorMessage = error.message || 'Error al iniciar sesión';
-        
+
         // Manejar errores específicos
         if (error.data) {
             switch (error.data.error) {
                 case 'ACCOUNT_BLOCKED':
                     this.handleAccountBlocked(error.data);
                     return;
-                
+
                 case 'ACCOUNT_INACTIVE':
                     errorMessage = 'Tu cuenta está desactivada. Contacta al administrador.';
                     break;
-                
+
                 case 'AUTH_ERROR':
                     errorMessage = this.getAuthErrorMessage();
                     break;
-                
+
                 case 'VALIDATION_ERROR':
                     errorMessage = 'Por favor, verifica los datos ingresados.';
                     break;
             }
         }
-        
+
         this.showMessage(errorMessage, 'error');
-        
+
         // Enfocar campo de contraseña para reintento
         this.passwordInput.focus();
         this.passwordInput.select();
@@ -206,23 +206,23 @@ class LoginForm {
      */
     handleAccountBlocked(errorData) {
         const details = errorData.details || {};
-        
+
         let message = 'Cuenta bloqueada por múltiples intentos fallidos.';
-        
+
         if (details.retry_after_minutes) {
             message += `\n\nPodrás intentar de nuevo en ${details.retry_after_minutes} minutos.`;
         }
-        
+
         if (details.blocked_until) {
             const blockedUntil = new Date(details.blocked_until);
             message += `\n\nBloqueado hasta: ${ApiUtils.formatDateTime(details.blocked_until)}`;
         }
-        
+
         this.showMessage(message, 'error');
-        
+
         // Deshabilitar formulario temporalmente
         this.setFormDisabled(true);
-        
+
         // Programar reactivación
         if (details.retry_after_minutes) {
             setTimeout(() => {
@@ -238,11 +238,11 @@ class LoginForm {
      */
     getAuthErrorMessage() {
         const remaining = LOGIN_CONFIG.maxAttempts - this.attemptCount;
-        
+
         if (remaining <= 2) {
             return `Credenciales incorrectas. Te quedan ${remaining} intento(s) antes del bloqueo.`;
         }
-        
+
         return 'Email o contraseña incorrectos. Verifica tus datos.';
     }
 
@@ -252,10 +252,10 @@ class LoginForm {
      */
     validateForm() {
         let isValid = true;
-        
+
         if (!this.validateEmail()) isValid = false;
         if (!this.validatePassword()) isValid = false;
-        
+
         return isValid;
     }
 
@@ -266,13 +266,13 @@ class LoginForm {
     validateEmail() {
         const email = this.emailInput.value.trim();
         const isValid = email && ApiUtils.isValidEmail(email);
-        
+
         this.setFieldValidation(this.emailInput, isValid);
-        
+
         if (!isValid && email) {
             this.showFieldError(this.emailInput, 'Ingresa un email válido');
         }
-        
+
         return isValid;
     }
 
@@ -283,13 +283,13 @@ class LoginForm {
     validatePassword() {
         const password = this.passwordInput.value;
         const isValid = password && password.length >= LOGIN_CONFIG.passwordMinLength;
-        
+
         this.setFieldValidation(this.passwordInput, isValid);
-        
+
         if (!isValid && password) {
             this.showFieldError(this.passwordInput, `Mínimo ${LOGIN_CONFIG.passwordMinLength} caracteres`);
         }
-        
+
         return isValid;
     }
 
@@ -311,15 +311,15 @@ class LoginForm {
     showFieldError(field, message) {
         // Buscar o crear contenedor de error
         let errorDiv = field.parentNode.querySelector('.field-error');
-        
+
         if (!errorDiv) {
             errorDiv = document.createElement('div');
             errorDiv.className = 'field-error';
             field.parentNode.appendChild(errorDiv);
         }
-        
+
         errorDiv.textContent = message;
-        
+
         // Auto-ocultar después de 3 segundos
         setTimeout(() => {
             if (errorDiv.parentNode) {
@@ -347,7 +347,7 @@ class LoginForm {
     setLoadingState(loading) {
         this.isSubmitting = loading;
         this.loginBtn.disabled = loading;
-        
+
         if (loading) {
             this.btnText.style.display = 'none';
             this.btnLoading.style.display = 'flex';
@@ -355,7 +355,7 @@ class LoginForm {
             this.btnText.style.display = 'inline';
             this.btnLoading.style.display = 'none';
         }
-        
+
         // Deshabilitar campos durante carga
         this.emailInput.disabled = loading;
         this.passwordInput.disabled = loading;
@@ -376,19 +376,17 @@ class LoginForm {
 
     /**
      * Alternar visibilidad de contraseña
-     */
-    togglePassword() {
+     */    togglePassword() {
         const isPassword = this.passwordInput.type === 'password';
-        const toggleText = this.togglePasswordBtn.querySelector('.toggle-text');
-        
+
         if (isPassword) {
             this.passwordInput.type = 'text';
-            this.togglePasswordBtn.innerHTML = '🙈 <span class="toggle-text">Ocultar</span>';
+            this.togglePasswordBtn.classList.add('showing');
         } else {
             this.passwordInput.type = 'password';
-            this.togglePasswordBtn.innerHTML = '👁️ <span class="toggle-text">Mostrar</span>';
+            this.togglePasswordBtn.classList.remove('showing');
         }
-        
+
         // Mantener focus en el campo
         this.passwordInput.focus();
     }
@@ -405,21 +403,21 @@ class LoginForm {
             warning: '⚠️',
             info: 'ℹ️'
         };
-        
+
         this.messageArea.innerHTML = `
             <div class="message message-${type}">
                 <span class="message-icon">${icons[type] || icons.info}</span>
                 <span class="message-text">${message.replace(/\n/g, '<br>')}</span>
             </div>
         `;
-        
+
         this.messageArea.style.display = 'block';
-        
+
         // Auto-ocultar mensajes de éxito
         if (type === 'success') {
             setTimeout(() => this.hideMessage(), 3000);
         }
-        
+
         // Scroll al mensaje si está fuera de vista
         this.messageArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -443,7 +441,7 @@ class LoginForm {
      */
     loadRememberedData() {
         const rememberedEmail = localStorage.getItem('rememberedEmail');
-        
+
         if (rememberedEmail) {
             this.emailInput.value = rememberedEmail;
             this.rememberCheckbox.checked = true;
@@ -473,14 +471,14 @@ class LoginForm {
      */
     setupQuickFillButtons() {
         const quickFillBtns = document.querySelectorAll('.quick-fill');
-        
+
         quickFillBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
-                
+
                 const email = btn.getAttribute('data-email');
                 const password = btn.getAttribute('data-password');
-                
+
                 this.animateAutoFill(email, password);
             });
         });
@@ -495,7 +493,7 @@ class LoginForm {
         // Limpiar campos primero
         this.emailInput.value = '';
         this.passwordInput.value = '';
-        
+
         // Animar escritura del email
         this.typeText(this.emailInput, email, () => {
             // Después animar la contraseña
@@ -514,11 +512,11 @@ class LoginForm {
     typeText(element, text, callback = null) {
         let i = 0;
         element.focus();
-        
+
         const interval = setInterval(() => {
             element.value = text.substring(0, i + 1);
             i++;
-            
+
             if (i >= text.length) {
                 clearInterval(interval);
                 if (callback) callback();
@@ -562,16 +560,16 @@ class LoginForm {
      */
     isLockedOut() {
         const lockoutUntil = localStorage.getItem('lockout_until');
-        
+
         if (lockoutUntil && Date.now() < parseInt(lockoutUntil)) {
             return true;
         }
-        
+
         // Si pasó el tiempo, limpiar lockout
         if (lockoutUntil) {
             localStorage.removeItem('lockout_until');
         }
-        
+
         return false;
     }
 
@@ -590,11 +588,11 @@ class LoginForm {
      */
     showLockoutMessage() {
         const lockoutUntil = localStorage.getItem('lockout_until');
-        
+
         if (lockoutUntil) {
             const remainingMs = parseInt(lockoutUntil) - Date.now();
             const remainingMinutes = Math.ceil(remainingMs / (1000 * 60));
-            
+
             this.showMessage(
                 `Demasiados intentos fallidos. Espera ${remainingMinutes} minuto(s) antes de intentar nuevamente.`,
                 'warning'
@@ -607,7 +605,7 @@ class LoginForm {
 // Inicialización cuando el DOM esté listo
 // =============================================================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Verificar que estamos en la página de login
     if (document.getElementById('loginForm')) {
         loginFormInstance = new LoginForm();
@@ -623,7 +621,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * Función global para mostrar errores
  * @param {string} message - Mensaje de error
  */
-window.showGlobalError = function(message) {
+window.showGlobalError = function (message) {
     if (loginFormInstance) {
         loginFormInstance.showMessage(message, 'error');
     }
@@ -634,7 +632,7 @@ window.showGlobalError = function(message) {
  * @param {string} message - Mensaje
  * @param {string} type - Tipo de mensaje
  */
-window.showGlobalMessage = function(message, type = 'info') {
+window.showGlobalMessage = function (message, type = 'info') {
     if (loginFormInstance) {
         loginFormInstance.showMessage(message, type);
     }
