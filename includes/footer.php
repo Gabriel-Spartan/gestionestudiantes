@@ -21,10 +21,8 @@ $basePath = '/gestionestudiantes';
                     <li class="list-item-fs"><a href="<?php echo $basePath; ?>/nosotros.php"
                             class="link-fs">Nosotros</a></li>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="list-item-fs"><a href="<?php echo $basePath; ?>/servicios.php"
-                                class="link-fs">Servicios</a></li>
                         <li class="list-item-fs"><a href="<?php echo $basePath; ?>/dashboard.php"
-                                class="link-fs">Dashboard</a></li>
+                                class="link-fs">Servicios</a></li>
                     <?php endif; ?>
                     <li class="list-item-fs"><a href="<?php echo $basePath; ?>/contactanos.php"
                             class="link-fs">Contáctanos</a></li>

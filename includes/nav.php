@@ -42,23 +42,13 @@ function isActive($page)
                         class="navbar-link <?php echo isActive('nosotros.php'); ?>">
                         Nosotros
                     </a>
+                </li> <!-- Servicios (Dashboard) - Redirección según login -->
+                <li class="navbar-item">
+                    <a href="<?php echo $isLoggedIn ? $basePath . '/dashboard.php' : $basePath . '/login.php'; ?>"
+                        class="navbar-link <?php echo isActive('dashboard.php') || isActive('servicios.php') ? 'active' : ''; ?>">
+                        Servicios
+                    </a>
                 </li>
-
-                <!-- Servicios - Solo usuarios logueados -->
-                <?php if ($isLoggedIn): ?>
-                    <li class="navbar-item">
-                        <a href="<?php echo $basePath; ?>/servicios.php"
-                            class="navbar-link <?php echo isActive('servicios.php'); ?>">
-                            Servicios
-                        </a>
-                    </li>
-                <?php else: ?>
-                    <li class="navbar-item">
-                        <span class="navbar-link disabled" title="Debes iniciar sesión para acceder">
-                            Servicios
-                        </span>
-                    </li>
-                <?php endif; ?>
 
                 <!-- Contacto - Acceso público -->
                 <li class="navbar-item">
@@ -67,49 +57,34 @@ function isActive($page)
                         Contáctanos
                     </a>
                 </li>
+
+                <!-- Botón Iniciar/Cerrar Sesión -->
+                <li class="navbar-item navbar-item-session">
+                    <?php if ($isLoggedIn): ?>
+                        <a href="<?php echo $basePath; ?>/logout.php" class="navbar-link navbar-logout">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </a>
+                    <?php else: ?>
+                        <a href="<?php echo $basePath; ?>/login.php"
+                            class="navbar-link navbar-login <?php echo isActive('login.php'); ?>">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    <?php endif; ?>
+                </li>
             </ul>
 
-            <!-- Menú de usuario -->
-            <div class="nav-user">
-                <?php if ($isLoggedIn): ?>
+            <!-- Menú de usuario - Solo mostrar info si está logueado -->
+            <?php if ($isLoggedIn): ?>
+                <div class="nav-user">
                     <!-- Usuario logueado -->
                     <div class="user-info">
                         <span class="user-name">
                             Hola, <?php echo htmlspecialchars($_SESSION['user_name']); ?>
                         </span>
-                        <span class="user-type">
-                            (<?php echo htmlspecialchars($_SESSION['user_type']); ?>)
-                        </span>
                     </div>
-
-                    <ul class="user-menu">
-                        <li class="nav-item">
-                            <a href="dashboard.php" class="nav-link <?php echo isActive('dashboard.php'); ?>">
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="students/" class="nav-link">
-                                Estudiantes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="logout.php" class="nav-link logout">
-                                Cerrar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                <?php else: ?> <!-- Usuario no logueado -->
-                    <ul class="navbar-menu">
-                        <li class="navbar-item">
-                            <a href="<?php echo $basePath; ?>/login.php"
-                                class="navbar-link <?php echo isActive('login.php'); ?>">
-                                Iniciar Sesión
-                            </a>
-                        </li>
-                    </ul>
-                <?php endif; ?>
-            </div>
+                </div>
+            <?php endif; ?>
+        </div>
         </div>
     </nav>
 </header>

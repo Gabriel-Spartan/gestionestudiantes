@@ -126,3 +126,46 @@ a {
     color: inherit;
     transition: all 0.3s ease;
 }
+
+/* Estilos para la sección de servicios (dashboard) */
+.services-main {
+    padding: 2rem 0;
+}
+
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #eee;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--uta-primary);
+}
+
+.service-icon {
+    font-size: 3rem;
+    color: var(--uta-primary);
+    margin-bottom: 1rem;
+}
+
+.welcome-card {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-left: 4px solid var(--uta-primary);
+    border-radius: 4px;
+}
+
+.card-header.bg-primary {
+    background-color: var(--uta-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--uta-primary);
+    border-color: var(--uta-secondary);
+}
+
+.btn-primary:hover {
+    background-color: var(--uta-secondary);
+    border-color: var(--uta-secondary);
+}

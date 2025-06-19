@@ -4,20 +4,32 @@
     Variables CSS para fácil mantenimiento
     ========================================================================== */
 :root {
-    --primary-color: #8B0000;    /* Color vino principal */
-    --primary-hover: #6B0000;    /* Color vino oscuro */
-    --success-color: #28a745;    /* Color éxito se mantiene */
-    --error-color: #dc3545;      /* Color error se mantiene */
-    --warning-color: #ffc107;    /* Color advertencia se mantiene */
-    --info-color: #722F37;       /* Color info adaptado */
-    
-    --bg-light: #f8f9fa;         /* Fondo claro se mantiene */
-    --bg-white: #ffffff;         /* Blanco se mantiene */
-    --text-dark: #333333;        /* Texto oscuro se mantiene */
-    --text-muted: #666666;       /* Texto muted se mantiene */
-    --border-color: #dddddd;     /* Color borde se mantiene */
-    --border-focus: rgba(139, 0, 0, 0.25);  /* Color focus adaptado al vino */
-    
+    --primary-color: #8B0000;
+    /* Color vino principal */
+    --primary-hover: #6B0000;
+    /* Color vino oscuro */
+    --success-color: #28a745;
+    /* Color éxito se mantiene */
+    --error-color: #dc3545;
+    /* Color error se mantiene */
+    --warning-color: #ffc107;
+    /* Color advertencia se mantiene */
+    --info-color: #722F37;
+    /* Color info adaptado */
+
+    --bg-light: #f8f9fa;
+    /* Fondo claro se mantiene */
+    --bg-white: #ffffff;
+    /* Blanco se mantiene */
+    --text-dark: #333333;
+    /* Texto oscuro se mantiene */
+    --text-muted: #666666;
+    /* Texto muted se mantiene */
+    --border-color: #dddddd;
+    /* Color borde se mantiene */
+    --border-focus: rgba(139, 0, 0, 0.25);
+    /* Color focus adaptado al vino */
+
     --border-radius: 8px;
     --border-radius-sm: 4px;
     --transition: all 0.3s ease;
@@ -184,11 +196,11 @@
     transition: var(--transition);
 }
 
-.checkbox-wrapper:hover input ~ .checkmark {
+.checkbox-wrapper:hover input~.checkmark {
     border-color: var(--primary-color);
 }
 
-.checkbox-wrapper input:checked ~ .checkmark {
+.checkbox-wrapper input:checked~.checkmark {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
@@ -206,7 +218,7 @@
     transform: rotate(45deg);
 }
 
-.checkbox-wrapper input:checked ~ .checkmark:after {
+.checkbox-wrapper input:checked~.checkmark:after {
     display: block;
 }
 
@@ -263,8 +275,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ==========================================================================
@@ -290,6 +307,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -427,15 +445,15 @@
         margin: 1rem auto;
         padding: 0 0.5rem;
     }
-    
+
     .login-form-wrapper {
         padding: 2rem 1.5rem;
     }
-    
+
     .test-accounts {
         grid-template-columns: 1fr;
     }
-    
+
     .login-form-wrapper h1 {
         font-size: 1.75rem;
     }
@@ -445,12 +463,12 @@
     .login-form-wrapper {
         padding: 1.5rem 1rem;
     }
-    
+
     .form-group input[type="email"],
     .form-group input[type="password"] {
         padding: 0.75rem;
     }
-    
+
     .login-btn {
         padding: 0.75rem;
     }
@@ -476,11 +494,12 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
+
     .form-group input[type="email"],
     .form-group input[type="password"] {
         border-width: 2px;
     }
-    
+
     .message {
         border-left-width: 6px;
     }
