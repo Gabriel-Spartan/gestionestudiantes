@@ -12,7 +12,7 @@ if (isset($_SESSION['user_id'])) {
 ?>
 
 <main>
-    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="stylesheet" href="assets/css/login-style.css">
     <section class="login-container">
         <div class="login-form-wrapper">
             <h1>Iniciar Sesión</h1>
@@ -69,39 +69,7 @@ if (isset($_SESSION['user_id'])) {
                 <!-- Los mensajes se insertarán aquí dinámicamente -->
             </div>
             
-            <!-- Información de ayuda -->
-            <div class="login-help">
-                <h3>Cuentas de prueba:</h3>
-                <div class="test-accounts">
-                    <div class="account">
-                        <strong>Administrador:</strong><br>
-                        <span class="email">admin@gestion.com</span><br>
-                        <span class="password">Admin12345</span>
-                        <button class="quick-fill" data-email="admin@gestion.com" data-password="Admin12345">
-                            ⚡ Autocompletar
-                        </button>
-                    </div>
-                    <div class="account">
-                        <strong>Secretaria:</strong><br>
-                        <span class="email">secretaria@gestion.com</span><br>
-                        <span class="password">Admin12345</span>
-                        <button class="quick-fill" data-email="secretaria@gestion.com" data-password="Admin12345">
-                            ⚡ Autocompletar
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="security-info">
-                    <h4>🛡️ Información de seguridad:</h4>
-                    <ul>
-                        <li>Máximo 5 intentos fallidos antes de bloqueo</li>
-                        <li>Bloqueo automático por tiempo configurable</li>
-                        <li>Sesión expira en 30 minutos de inactividad</li>
-                        <li>Máximo de sesiones simultáneas limitado</li>
-                        <li>Auditoría completa de todos los accesos</li>
-                    </ul>
-                </div>
-            </div>
+            
         </div>
     </section>
 </main>
