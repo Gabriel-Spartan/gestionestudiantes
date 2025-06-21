@@ -4,20 +4,32 @@
     Variables CSS para fácil mantenimiento
     ========================================================================== */
 :root {
-    --primary-color: #007bff;
-    --primary-hover: #0056b3;
+    --primary-color: #8B0000;
+    /* Color vino principal */
+    --primary-hover: #6B0000;
+    /* Color vino oscuro */
     --success-color: #28a745;
+    /* Color éxito se mantiene */
     --error-color: #dc3545;
+    /* Color error se mantiene */
     --warning-color: #ffc107;
-    --info-color: #17a2b8;
-    
+    /* Color advertencia se mantiene */
+    --info-color: #722F37;
+    /* Color info adaptado */
+
     --bg-light: #f8f9fa;
+    /* Fondo claro se mantiene */
     --bg-white: #ffffff;
+    /* Blanco se mantiene */
     --text-dark: #333333;
+    /* Texto oscuro se mantiene */
     --text-muted: #666666;
+    /* Texto muted se mantiene */
     --border-color: #dddddd;
-    --border-focus: rgba(0, 123, 255, 0.25);
-    
+    /* Color borde se mantiene */
+    --border-focus: rgba(139, 0, 0, 0.25);
+    /* Color focus adaptado al vino */
+
     --border-radius: 8px;
     --border-radius-sm: 4px;
     --transition: all 0.3s ease;
@@ -95,7 +107,8 @@
 }
 
 .form-group input[type="email"],
-.form-group input[type="password"] {
+.form-group input[type="password"],
+.form-group input[type="text"] {
     width: 100%;
     padding: 0.875rem 1rem;
     border: 2px solid var(--border-color);
@@ -104,6 +117,7 @@
     box-sizing: border-box;
     transition: var(--transition);
     background: var(--bg-white);
+    padding-right: 95px;
 }
 
 .form-group input:focus {
@@ -141,16 +155,31 @@
     border-radius: var(--border-radius-sm);
     transition: var(--transition);
     user-select: none;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.toggle-password:hover {
-    background: var(--bg-light);
-    color: var(--text-dark);
+.toggle-password::before {
+    content: "\f070";
+    /* Ícono de ojo tachado (contraseña oculta) */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-size: 16px;
 }
 
-.toggle-password:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+/* Cuando la contraseña está visible */
+.toggle-password.showing::before {
+    content: "\f06e";
+    /* Ícono de ojo (contraseña visible) */
+}
+
+/* Ocultar el texto y emojis originales */
+.toggle-password span,
+.toggle-password emoji {
+    display: none;
 }
 
 /* Custom checkbox */
@@ -184,11 +213,11 @@
     transition: var(--transition);
 }
 
-.checkbox-wrapper:hover input ~ .checkmark {
+.checkbox-wrapper:hover input~.checkmark {
     border-color: var(--primary-color);
 }
 
-.checkbox-wrapper input:checked ~ .checkmark {
+.checkbox-wrapper input:checked~.checkmark {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
@@ -206,7 +235,7 @@
     transform: rotate(45deg);
 }
 
-.checkbox-wrapper input:checked ~ .checkmark:after {
+.checkbox-wrapper input:checked~.checkmark:after {
     display: block;
 }
 
@@ -263,8 +292,13 @@
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ==========================================================================
@@ -290,6 +324,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -427,15 +462,15 @@
         margin: 1rem auto;
         padding: 0 0.5rem;
     }
-    
+
     .login-form-wrapper {
         padding: 2rem 1.5rem;
     }
-    
+
     .test-accounts {
         grid-template-columns: 1fr;
     }
-    
+
     .login-form-wrapper h1 {
         font-size: 1.75rem;
     }
@@ -445,12 +480,12 @@
     .login-form-wrapper {
         padding: 1.5rem 1rem;
     }
-    
+
     .form-group input[type="email"],
     .form-group input[type="password"] {
         padding: 0.75rem;
     }
-    
+
     .login-btn {
         padding: 0.75rem;
     }
@@ -476,12 +511,33 @@
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
+
     .form-group input[type="email"],
     .form-group input[type="password"] {
         border-width: 2px;
     }
-    
+
     .message {
         border-left-width: 6px;
     }
+}
+
+/* Ocultar el ícono de revelación de contraseña nativo del navegador */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}
+
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    height: 0;
+    width: 0;
+    margin: 0;
+}
+
+.form-group input[type="password"] {
+    -webkit-text-security: disc !important;
 }

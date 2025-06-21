@@ -1,0 +1,80 @@
+/* Estilos para el footer */
+.footer-fs {
+    background: linear-gradient(135deg, #560c0c, #5E262D);
+    color: white;
+    padding: 40px 0 20px;
+    margin-top: 60px;
+}
+
+.container-fs {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.grid-fs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.section-fs {
+    margin-bottom: 20px;
+}
+
+.title-fs {
+    color: white;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.list-fs {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-item-fs {
+    margin-bottom: 8px;
+}
+
+.link-fs {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.link-fs:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.contact-info-fs p,
+.system-info-fs p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+/* Estilos para el copyright del footer */
+.footer-bottom-fs {
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 30px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.copyright-fs p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grid-fs {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+}
