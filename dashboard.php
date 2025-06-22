@@ -50,9 +50,8 @@ $userType = $_SESSION['user_type'] ?? '';
                     <div class="card-body text-center">
                         <i class="fas fa-user-graduate service-icon"></i>
                         <h5 class="card-title">Gestión de Estudiantes</h5>
-                        <p class="card-text">Administra los datos de los estudiantes, registra nuevos ingresos y
-                            gestiona su información académica.</p>
-                        <a href="students/index.php" class="btn btn-primary">Acceder</a>
+                        <p class="card-text">Administra los datos de los estudiantes, registra nuevos ingresos y gestiona su información académica.</p>
+                        <a href="students/student.php" class="btn btn-primary">Acceder</a>
                     </div>
                 </div>
             </div>
