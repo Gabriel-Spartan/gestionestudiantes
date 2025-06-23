@@ -1,6 +1,6 @@
 <?php
 // dashboard.php - Panel de servicios del sistema
-$pageTitle = "Servicios";
+$pageTitle = "Gestión de Estudiantes";
 include 'includes/header.php';
 include 'includes/nav.php';
 
@@ -10,77 +10,53 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Obtener información del usuario desde la sesión
-$userName = $_SESSION['user_name'] ?? 'Usuario';
-$userEmail = $_SESSION['user_email'] ?? '';
-$userType = $_SESSION['user_type'] ?? '';
+// Incluir la función para mostrar la tabla de estudiantes
+require_once __DIR__ . '/config/database.php';
+
+function mostrarTablaEstudiantes()
+{
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->query('SELECT cedula, nombre, apellido, direccion, telefono FROM estudiantes ORDER BY apellido, nombre');
+        $estudiantes = $stmt->fetchAll();
+    } catch (Exception $e) {
+        echo '<div class="alert alert-danger">Error al obtener estudiantes: ' . htmlspecialchars($e->getMessage()) . '</div>';
+        return;
+    }
+    echo '<div class="d-flex justify-content-between align-items-center mb-3">';
+    echo '<h5 class="mb-0">Listado de Estudiantes</h5>';
+    echo '<a href="students/create.php" class="btn btn-success"><i class="fas fa-user-plus"></i> Agregar Estudiante</a>';
+    echo '</div>';
+    echo '<div class="table-responsive">';
+    echo '<table class="table table-striped table-bordered align-middle">';
+    echo '<thead class="table-dark"><tr>';
+    echo '<th>Cédula</th><th>Nombre</th><th>Apellido</th><th>Dirección</th><th>Teléfono</th><th>Acciones</th>';
+    echo '</tr></thead><tbody>';
+    if (empty($estudiantes)) {
+        echo '<tr><td colspan="6" class="text-center">No hay estudiantes registrados.</td></tr>';
+    } else {
+        foreach ($estudiantes as $est) {
+            $cedula = htmlspecialchars($est['cedula']);
+            echo '<tr>';
+            echo '<td>' . $cedula . '</td>';
+            echo '<td>' . htmlspecialchars($est['nombre']) . '</td>';
+            echo '<td>' . htmlspecialchars($est['apellido']) . '</td>';
+            echo '<td>' . htmlspecialchars($est['direccion']) . '</td>';
+            echo '<td>' . htmlspecialchars($est['telefono']) . '</td>';
+            echo '<td>';
+            echo '<a href="students/edit.php?cedula=' . $cedula . '" class="btn btn-sm btn-warning me-1"><i class="fas fa-edit"></i> Editar</a>';
+            echo '<a href="students/delete.php?cedula=' . $cedula . '" class="btn btn-sm btn-danger" onclick="return confirm(\'¿Seguro que deseas eliminar este estudiante?\');"><i class="fas fa-trash"></i> Eliminar</a>';
+            echo '</td>';
+            echo '</tr>';
+        }
+    }
+    echo '</tbody></table></div>';
+}
 ?>
 
 <main class="services-main">
     <div class="container mt-4">
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0">Servicios Académicos</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-lg-4 mb-4">
-                                <div class="welcome-card">
-                                    <h5>Bienvenido, <?php echo htmlspecialchars($userName); ?></h5>
-                                    <p class="text-muted">Accede a los servicios disponibles según tu rol:
-                                        <strong><?php echo htmlspecialchars($userType); ?></strong></p>
-                                </div>
-                            </div>
-                            <div class="col-lg-8">
-                                <p>El sistema de <strong>Gestión de Estudiantes</strong> permite administrar de forma
-                                    eficiente los datos de los alumnos registrados en la institución.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Tarjeta de Gestión de Estudiantes -->
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-user-graduate service-icon"></i>
-                        <h5 class="card-title">Gestión de Estudiantes</h5>
-                        <p class="card-text">Administra los datos de los estudiantes, registra nuevos ingresos y gestiona su información académica.</p>
-                        <a href="students/student.php" class="btn btn-primary">Acceder</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tarjeta de Informes -->
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-chart-bar service-icon"></i>
-                        <h5 class="card-title">Informes y Estadísticas</h5>
-                        <p class="card-text">Visualiza estadísticas e informes sobre los estudiantes registrados en el
-                            sistema.</p>
-                        <a href="#" class="btn btn-primary">Próximamente</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tarjeta de Configuración -->
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 service-card">
-                    <div class="card-body text-center">
-                        <i class="fas fa-cog service-icon"></i>
-                        <h5 class="card-title">Configuración</h5>
-                        <p class="card-text">Administra tu perfil, preferencias y datos de acceso al sistema.</p>
-                        <a href="#" class="btn btn-primary">Próximamente</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <?php mostrarTablaEstudiantes(); ?>
     </div>
 </main>
 
