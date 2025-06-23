@@ -44,7 +44,6 @@ function mostrarTablaEstudiantes()
 // Mostrar la tabla directamente al cargar la página
 include_once __DIR__ . '/../includes/header.php';
 echo '<div class="container mt-4">';
-echo '<a href="../dashboard.php" class="btn btn-secondary mb-3"><i class="fas fa-arrow-left"></i> Regresar</a>';
 mostrarTablaEstudiantes();
 echo '</div>';
 include_once __DIR__ . '/../includes/footer.php';
