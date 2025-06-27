@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 include_once __DIR__ . '/../includes/header.php';
+include_once __DIR__ . '/../includes/header.php';
+include_once __DIR__ . '/../includes/nav.php';
 
 $errores = [];
 $exito = false;

@@ -2,25 +2,172 @@
 // api/helpers/cors.php - Configuración de CORS y headers para API
 
 /**
- * Configurar headers CORS para permitir requests desde diferentes orígenes
- * Necesario para testing con Postman y requests desde frontend
+ * Inicializar API con headers CORS y configuración básica
+ */
+function initializeApi() {
+    // Headers CORS
+    setCorsHeaders();
+    
+    // Headers de contenido
+    header('Content-Type: application/json; charset=utf-8');
+    
+    // Headers de seguridad
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: DENY');
+    header('X-XSS-Protection: 1; mode=block');
+    
+    // Manejar preflight OPTIONS request
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit();
+    }
+}
+
+/**
+ * Configurar headers CORS
  */
 function setCorsHeaders() {
-    // Permitir requests desde cualquier origen (desarrollo)
-    // En producción, cambiar '*' por el dominio específico
-    header("Access-Control-Allow-Origin: *");
+    // Permitir origen local para desarrollo
+    $allowedOrigins = [
+        'http://localhost',
+        'http://127.0.0.1',
+        'http://localhost:3000',
+        'http://localhost:8000'
+    ];
     
-    // Métodos HTTP permitidos
-    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     
-    // Headers permitidos en requests
-    header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin");
+    // En desarrollo local, permitir cualquier localhost
+    if (isLocalDevelopment()) {
+        if (strpos($origin, 'localhost') !== false || strpos($origin, '127.0.0.1') !== false) {
+            header("Access-Control-Allow-Origin: $origin");
+        } else {
+            header("Access-Control-Allow-Origin: *");
+        }
+    } else {
+        // En producción, verificar orígenes permitidos
+        if (in_array($origin, $allowedOrigins)) {
+            header("Access-Control-Allow-Origin: $origin");
+        }
+    }
     
-    // Permitir credenciales (cookies, sessions)
-    header("Access-Control-Allow-Credentials: true");
+    header('Access-Control-Allow-Credentials: true');
+    header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
+    header('Access-Control-Max-Age: 86400'); // 24 horas
+}
+
+/**
+ * Detectar si estamos en desarrollo local
+ */
+function isLocalDevelopment() {
+    $localHosts = ['localhost', '127.0.0.1', '::1'];
+    $currentHost = $_SERVER['HTTP_HOST'] ?? '';
     
-    // Tiempo de cache para preflight requests (24 horas)
-    header("Access-Control-Max-Age: 86400");
+    return in_array($currentHost, $localHosts) ||
+           strpos($currentHost, 'localhost') !== false ||
+           strpos($currentHost, '.local') !== false ||
+           strpos($currentHost, '192.168') !== false ||
+           strpos($currentHost, '10.') === 0;
+}
+
+/**
+ * Validar token CSRF (si se implementa)
+ */
+function validateCsrfToken() {
+    // Implementar si se necesita protección CSRF
+    // Por ahora, validamos que venga de una sesión válida
+    return true;
+}
+
+/**
+ * Rate limiting básico por IP
+ */
+function checkRateLimit($maxRequests = 100, $timeWindow = 3600) {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $cacheFile = sys_get_temp_dir() . '/api_rate_limit_' . md5($ip);
+    
+    $requests = [];
+    $currentTime = time();
+    
+    // Leer requests previos si existen
+    if (file_exists($cacheFile)) {
+        $data = file_get_contents($cacheFile);
+        $requests = json_decode($data, true) ?: [];
+    }
+    
+    // Filtrar requests dentro de la ventana de tiempo
+    $requests = array_filter($requests, function($timestamp) use ($currentTime, $timeWindow) {
+        return ($currentTime - $timestamp) < $timeWindow;
+    });
+    
+    // Verificar si excede el límite
+    if (count($requests) >= $maxRequests) {
+        require_once __DIR__ . '/response.php';
+        sendRateLimitResponse($timeWindow);
+    }
+    
+    // Agregar request actual
+    $requests[] = $currentTime;
+    
+    // Guardar en cache
+    file_put_contents($cacheFile, json_encode($requests));
+    
+    return true;
+}
+
+/**
+ * Limpiar archivos de rate limit antiguos
+ */
+function cleanupRateLimitFiles() {
+    $tempDir = sys_get_temp_dir();
+    $pattern = $tempDir . '/api_rate_limit_*';
+    $files = glob($pattern);
+    $currentTime = time();
+    
+    foreach ($files as $file) {
+        if (($currentTime - filemtime($file)) > 7200) { // 2 horas
+            unlink($file);
+        }
+    }
+}
+
+/**
+ * Log de requests de API para debugging
+ */
+function logApiRequest() {
+    if (!isLocalDevelopment()) {
+        return;
+    }
+    
+    $logData = [
+        'timestamp' => date('Y-m-d H:i:s'),
+        'method' => $_SERVER['REQUEST_METHOD'],
+        'uri' => $_SERVER['REQUEST_URI'],
+        'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown'
+    ];
+    
+    $logFile = sys_get_temp_dir() . '/api_requests.log';
+    file_put_contents($logFile, json_encode($logData) . "\n", FILE_APPEND | LOCK_EX);
+}
+
+/**
+ * Validar que el request venga de la misma aplicación
+ */
+function validateReferrer() {
+    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    
+    // Si no hay referer, permitir (para requests directos de la API)
+    if (empty($referer)) {
+        return true;
+    }
+    
+    // Verificar que el referer sea del mismo host
+    $refererHost = parse_url($referer, PHP_URL_HOST);
+    
+    return $refererHost === $host;
 }
 
 /**
@@ -42,7 +189,6 @@ function setApiHeaders() {
 
 /**
  * Manejar requests OPTIONS (preflight)
- * Los navegadores envían OPTIONS antes de requests complejos
  */
 function handlePreflightRequest() {
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -54,24 +200,7 @@ function handlePreflightRequest() {
 }
 
 /**
- * Configuración completa de headers para endpoints API
- * Llamar al inicio de cada endpoint
- */
-function initializeApi() {
-    // Configurar CORS
-    setCorsHeaders();
-    
-    // Configurar headers de API
-    setApiHeaders();
-    
-    // Manejar preflight requests
-    handlePreflightRequest();
-}
-
-/**
  * Validar que el request sea del tipo esperado
- * @param string $expectedMethod - Método HTTP esperado (GET, POST, PUT, DELETE)
- * @return bool
  */
 function validateRequestMethod($expectedMethod) {
     $currentMethod = $_SERVER['REQUEST_METHOD'];
@@ -92,13 +221,12 @@ function validateRequestMethod($expectedMethod) {
 
 /**
  * Obtener datos JSON del body del request
- * @return array|null
  */
 function getJsonInput() {
     $input = file_get_contents('php://input');
     
     if (empty($input)) {
-        return null;
+        return [];
     }
     
     $data = json_decode($input, true);
@@ -116,99 +244,4 @@ function getJsonInput() {
     return $data;
 }
 
-/**
- * Configuración específica para desarrollo vs producción
- */
-function setEnvironmentHeaders() {
-    // Detectar si estamos en desarrollo
-    $isLocal = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) || 
-                strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
-    
-    if ($isLocal) {
-        // Headers más permisivos para desarrollo
-        header("Access-Control-Allow-Origin: *");
-        
-        // Mostrar errores PHP en desarrollo
-        ini_set('display_errors', 1);
-        error_reporting(E_ALL);
-    } else {
-        // Headers más restrictivos para producción
-        $allowedOrigins = [
-            'https://tudominio.com',
-            'https://www.tudominio.com'
-        ];
-        
-        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        if (in_array($origin, $allowedOrigins)) {
-            header("Access-Control-Allow-Origin: $origin");
-        }
-        
-        // Ocultar errores PHP en producción
-        ini_set('display_errors', 0);
-        error_reporting(0);
-    }
-}
-
-/**
- * Verificar si el request viene de un origen permitido
- * @return bool
- */
-function isOriginAllowed() {
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    
-    // En desarrollo, permitir todos los orígenes
-    $isLocal = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) || 
-                strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
-    
-    if ($isLocal) {
-        return true;
-    }
-    
-    // En producción, verificar lista de orígenes permitidos
-    $allowedOrigins = [
-        'https://tudominio.com',
-        'https://www.tudominio.com',
-        'https://app.tudominio.com'
-    ];
-    
-    return in_array($origin, $allowedOrigins);
-}
-
-/**
- * Log de requests para debugging (solo en desarrollo)
- */
-function logApiRequest() {
-    $isLocal = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']) || 
-                strpos($_SERVER['HTTP_HOST'], 'localhost') !== false;
-    
-    if ($isLocal) {
-        $logData = [
-            'timestamp' => date('Y-m-d H:i:s'),
-            'method' => $_SERVER['REQUEST_METHOD'],
-            'uri' => $_SERVER['REQUEST_URI'],
-            'origin' => $_SERVER['HTTP_ORIGIN'] ?? 'N/A',
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'N/A',
-            'ip' => $_SERVER['REMOTE_ADDR'] ?? 'N/A'
-        ];
-        
-        // En un proyecto real, esto iría a un archivo de log
-        // error_log("API Request: " . json_encode($logData));
-    }
-}
-
-// EJEMPLOS DE USO:
-/*
-// Al inicio de cualquier endpoint API:
-require_once '../helpers/cors.php';
-initializeApi();
-
-// Para validar método:
-validateRequestMethod('POST');
-
-// Para obtener datos JSON:
-$data = getJsonInput();
-
-// Para configurar environment específico:
-setEnvironmentHeaders();
-*/
 ?>
