@@ -1,0 +1,171 @@
+/* Tema personalizado UTA */
+:root {
+    --uta-primary: #8B0000;
+    /* Color vino principal */
+    --uta-secondary: #4A0404;
+    /* Color vino más oscuro */
+    --uta-accent: #D4AF37;
+    /* Dorado para acentos */
+    --uta-light: #F5F5F5;
+    /* Gris claro para fondos */
+    --uta-dark: #2C2C2C;
+    /* Gris oscuro para texto */
+}
+
+/* Asegurar que los estilos base se apliquen */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--uta-light, #f5f5f5);
+}
+
+/* Estilos para contenedores principales */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Fix para espaciado */
+* {
+    box-sizing: border-box;
+}
+
+/* Navbar personalizada */
+.navbar {
+    background-color: var(--uta-primary);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: white;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--uta-accent);
+}
+
+/* Botones personalizados */
+.btn-uta-primary {
+    background-color: var(--uta-primary);
+    color: white;
+    border: none;
+}
+
+.btn-uta-primary:hover {
+    background-color: var(--uta-secondary);
+    color: var(--uta-accent);
+}
+
+.btn-uta-outline {
+    border: 2px solid var(--uta-primary);
+    color: var(--uta-primary);
+    background-color: transparent;
+}
+
+.btn-uta-outline:hover {
+    background-color: var(--uta-primary);
+    color: white;
+}
+
+/* Cards personalizadas */
+.card-uta {
+    border-color: var(--uta-primary);
+}
+
+.card-uta .card-header {
+    background-color: var(--uta-primary);
+    color: white;
+}
+
+/* Headers y títulos */
+.uta-title {
+    color: var(--uta-primary);
+    border-bottom: 3px solid var(--uta-accent);
+    padding-bottom: 0.5rem;
+}
+
+/* Links personalizados */
+.uta-link {
+    color: var(--uta-primary);
+    text-decoration: none;
+}
+
+.uta-link:hover {
+    color: var(--uta-secondary);
+    text-decoration: underline;
+}
+
+/* Fondos */
+.bg-uta-primary {
+    background-color: var(--uta-primary);
+    color: white;
+}
+
+.bg-uta-light {
+    background-color: var(--uta-light);
+}
+
+/* Bordes */
+.border-uta {
+    border-color: var(--uta-primary) !important;
+}
+
+/* Textos */
+.text-uta-primary {
+    color: var(--uta-primary);
+}
+
+.text-uta-accent {
+    color: var(--uta-accent);
+}
+
+/* Asegurar que los enlaces funcionen */
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+/* Estilos para la sección de servicios (dashboard) */
+.services-main {
+    padding: 2rem 0;
+}
+
+.service-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #eee;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--uta-primary);
+}
+
+.service-icon {
+    font-size: 3rem;
+    color: var(--uta-primary);
+    margin-bottom: 1rem;
+}
+
+.welcome-card {
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-left: 4px solid var(--uta-primary);
+    border-radius: 4px;
+}
+
+.card-header.bg-primary {
+    background-color: var(--uta-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--uta-primary);
+    border-color: var(--uta-secondary);
+}
+
+.btn-primary:hover {
+    background-color: var(--uta-secondary);
+    border-color: var(--uta-secondary);
+}

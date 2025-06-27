@@ -1,0 +1,76 @@
+<?php
+// config/database.php - Configuración para desarrollo y producción
+// ARCHIVO DE EJEMPLO - Copiar y configurar según tu entorno
+
+// Detectar si estamos en desarrollo local o producción
+function isLocalEnvironment()
+{
+    $localHosts = ['localhost', '127.0.0.1', '::1'];
+    return in_array($_SERVER['HTTP_HOST'], $localHosts) ||
+        strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+        strpos($_SERVER['HTTP_HOST'], '.local') !== false;
+}
+
+// Configuración según el entorno
+if (isLocalEnvironment()) {
+    // CONFIGURACIÓN PARA DESARROLLO LOCAL (XAMPP)
+    $config = [
+        'host' => 'localhost',
+        'port' => '3306',                    // CAMBIAR si tu XAMPP usa otro puerto (ej: 3307)
+        'dbname' => 'gestion_estudiantes',   // Nombre de la base de datos
+        'username' => 'root',                // Usuario por defecto en XAMPP
+        'password' => '',                    // Contraseña vacía por defecto en XAMPP
+        'charset' => 'utf8'
+    ];
+} else {
+    // CONFIGURACIÓN PARA PRODUCCIÓN (HOSTING)
+    // ESTOS DATOS LOS PROPORCIONA TU HOSTING (InfinityFree, 000WebHost, etc.)
+    $config = [
+        'host' => 'sqlXXX.infinityfree.com',        // Host proporcionado por hosting
+        'port' => '3306',                           // Puerto estándar en hosting
+        'dbname' => 'epiz_XXXXXXX_gestion',        // Nombre asignado por hosting
+        'username' => 'epiz_XXXXXXX',              // Usuario proporcionado por hosting
+        'password' => 'tu_password_seguro',         // Contraseña del hosting
+        'charset' => 'utf8'
+    ];
+}
+
+try {
+    // Construir DSN (Data Source Name)
+    $dsn = "mysql:host={$config['host']};port={$config['port']};dbname={$config['dbname']};charset={$config['charset']}";
+
+    // Crear conexión PDO
+    $pdo = new PDO($dsn, $config['username'], $config['password']);
+
+    // Configurar atributos PDO para seguridad y eficiencia
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+    
+} catch (PDOException $e) {
+    // En producción, no mostrar detalles del error por seguridad
+    if (isLocalEnvironment()) {
+        die("❌ Error de conexión: " . $e->getMessage());
+    } else {
+        error_log("Database connection error: " . $e->getMessage());
+        die("❌ Error de conexión a la base de datos. Contacte al administrador.");
+    }
+}
+
+// INSTRUCCIONES DE CONFIGURACIÓN:
+// 
+// PARA DESARROLLO LOCAL (XAMPP):
+// 1. Verificar que XAMPP esté ejecutándose
+// 2. Confirmar puerto MySQL en XAMPP Control Panel
+// 3. Si tu puerto es diferente a 3306, cambiar la línea 15
+// 4. Crear base de datos 'gestion_estudiantes' en phpMyAdmin
+// 
+// PARA PRODUCCIÓN (HOSTING):
+// 1. Obtener datos de conexión desde panel de hosting
+// 2. Reemplazar valores en la sección "PRODUCCIÓN" (líneas 20-26)
+// 3. Subir archivos al hosting
+// 4. Importar database.sql en el hosting
+//
+// VERIFICAR CONEXIÓN:
+// Acceder a: http://localhost/gestionestudiantes/config/env_local.php
+?>
