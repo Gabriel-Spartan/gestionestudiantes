@@ -6,8 +6,6 @@
 require_once '../helpers/cors.php';
 require_once '../helpers/response.php';
 require_once '../config/database.php';
-include_once __DIR__ . '/../includes/header.php';
-include_once __DIR__ . '/../includes/nav.php';
 
 // Usar la función initializeApi que ya tienes
 initializeApi();

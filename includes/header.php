@@ -9,8 +9,13 @@ if (session_status() == PHP_SESSION_NONE) {
 $defaultTitle = "Gestión de Estudiantes";
 $finalTitle = isset($pageTitle) ? $pageTitle . " - " . $defaultTitle : $defaultTitle;
 
-// Definir la ruta base
-$basePath = '/gestionestudiantes';
+// Definir la ruta base según el entorno
+$localHosts = ['localhost', '127.0.0.1', '::1'];
+$isLocal = in_array($_SERVER['HTTP_HOST'], $localHosts) ||
+            strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '.local') !== false;
+
+$basePath = $isLocal ? '/gestionestudiantes' : '';
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -30,33 +35,41 @@ $basePath = '/gestionestudiantes';
     <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/uta-theme.css">
     <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/header-style.css">
     <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/navbar-style.css">
-    <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/footer-style.css"> <?php
-       // Agregar estilo específico de la página actual si existe
-       $currentPage = basename($_SERVER['PHP_SELF'], '.php');
+    <link rel="stylesheet" href="<?php echo $basePath; ?>/assets/css/footer-style.css">
+    <?php
+    // Agregar estilo específico de la página actual si existe
+    $currentPage = basename($_SERVER['PHP_SELF'], '.php');
 
-       // Mapear nombres de archivo a nombres de CSS
-       $cssMapping = [
-           'nosotros' => 'about',
-           'contactanos' => 'contact',
-           'index' => 'index',
-           'login' => 'login',
-           'dashboard' => 'dashboard'
-       ];
+    // Mapear nombres de archivo a nombres de CSS
+    $cssMapping = [
+        'nosotros' => 'about',
+        'contactanos' => 'contact',
+        'index' => 'index',
+        'login' => 'login',
+        'dashboard' => 'dashboard'
+    ];
 
-       $cssName = isset($cssMapping[$currentPage]) ? $cssMapping[$currentPage] : $currentPage;
-       $cssFile = $_SERVER['DOCUMENT_ROOT'] . "/gestionestudiantes/assets/css/{$cssName}-style.css";
+    $cssName = isset($cssMapping[$currentPage]) ? $cssMapping[$currentPage] : $currentPage;
+    
+    // Ajustar la ruta para la verificación de archivo
+    $cssFilePath = $isLocal 
+        ? $_SERVER['DOCUMENT_ROOT'] . "/gestionestudiantes/assets/css/{$cssName}-style.css"
+        : $_SERVER['DOCUMENT_ROOT'] . "/assets/css/{$cssName}-style.css";
 
-       if (file_exists($cssFile)) {
-           echo "<link rel=\"stylesheet\" href=\"{$basePath}/assets/css/{$cssName}-style.css\">";
-           echo "<!-- Cargando CSS específico: {$cssName}-style.css -->";
-       }
-       ?> <!-- Debug: Mostrar en consola si los CSS se cargan -->
+    if (file_exists($cssFilePath)) {
+        echo "<link rel=\"stylesheet\" href=\"{$basePath}/assets/css/{$cssName}-style.css\">";
+        echo "<!-- Cargando CSS específico: {$cssName}-style.css -->";
+    }
+    ?>
+    
+    <!-- Debug: Mostrar en consola si los CSS se cargan -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             console.log('=== DEBUG CSS ===');
             console.log('Base path: <?php echo $basePath; ?>');
             console.log('Current page: <?php echo $currentPage; ?>');
             console.log('CSS name: <?php echo isset($cssName) ? $cssName : "none"; ?>');
+            console.log('Is local: <?php echo $isLocal ? "true" : "false"; ?>');
 
             const cssFiles = [
                 '<?php echo $basePath; ?>/assets/css/uta-theme.css',
@@ -86,4 +99,4 @@ $basePath = '/gestionestudiantes';
     </script>
 </head>
 
-<body></body>
+<body>

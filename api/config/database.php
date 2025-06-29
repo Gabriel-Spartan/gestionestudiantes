@@ -23,11 +23,11 @@ if ($isLocal) {
 } else {
     // CONFIGURACIÓN PARA PRODUCCIÓN (HOSTING)
     $config = [
-        'host' => 'localhost',  // El hosting te dará esta info
-        'port' => '3306',       // Puerto estándar en hosting
-        'dbname' => 'tu_usuario_gestion_estudiantes',  // El hosting asigna nombres
-        'username' => 'tu_usuario_db',  // Usuario de BD del hosting
-        'password' => 'tu_password_seguro',  // Password del hosting
+        'host' => 'sql303.infinityfree.com',
+        'port' => '3306',
+        'dbname' => 'if0_39340414_gestion_estudiantes',
+        'username' => 'if0_39340414',
+        'password' => 'XxDhdHMyOnHU',
         'charset' => 'utf8'
     ];
 }

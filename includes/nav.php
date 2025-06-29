@@ -6,7 +6,12 @@ $isLoggedIn = isset($_SESSION['user_id']);
 $isAdmin = $isLoggedIn && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'ADMIN';
 
 // Definir la ruta base
-$basePath = '/gestionestudiantes';
+$localHosts = ['localhost', '127.0.0.1', '::1'];
+$isLocal = in_array($_SERVER['HTTP_HOST'], $localHosts) ||
+            strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '.local') !== false;
+
+$basePath = $isLocal ? '/gestionestudiantes' : '';
 
 // Función para marcar página activa
 function isActive($page)

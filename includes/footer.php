@@ -1,6 +1,11 @@
 <?php
 // Definir la ruta base para el footer
-$basePath = '/gestionestudiantes';
+$localHosts = ['localhost', '127.0.0.1', '::1'];
+$isLocal = in_array($_SERVER['HTTP_HOST'], $localHosts) ||
+            strpos($_SERVER['HTTP_HOST'], 'localhost') !== false ||
+            strpos($_SERVER['HTTP_HOST'], '.local') !== false;
+
+$basePath = $isLocal ? '/gestionestudiantes' : '';
 ?>
 
 <footer class="footer-fs">

@@ -1,0 +1,26 @@
+RewriteEngine On
+
+# Configuración de errores
+ErrorDocument 404 /404.php
+ErrorDocument 403 /403.php
+
+# Proteger archivos sensibles
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files ".env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Configuración PHP para InfinityFree
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 120
