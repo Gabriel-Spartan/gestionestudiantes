@@ -54,7 +54,7 @@ include 'includes/nav.php';
                 <!-- Karen Montero -->
                 <article class="member-card-cs">
                     <div class="member-info-cs">
-                        <h3>Karen Montero</h3>
+                        <h3>Karen Molina</h3>
                         <p class="role-cs">Desarrolladora Frontend</p>
                         <div class="contact-info-cs">
                             <p><i class="fas fa-phone"></i>0990972323</p>

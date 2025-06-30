@@ -13,6 +13,27 @@ if (!isset($_SESSION['user_id'])) {
 // Incluir la función para mostrar la tabla de estudiantes
 require_once __DIR__ . '/config/database.php';
 
+// Mostrar mensajes de éxito si existen
+if (isset($_GET['success'])) {
+    $successMessage = '';
+    switch ($_GET['success']) {
+        case 'student_created':
+            $studentName = $_GET['name'] ?? 'el estudiante';
+            $successMessage = "✅ Estudiante <strong>" . htmlspecialchars($studentName) . "</strong> creado exitosamente.";
+            break;
+        case 'student_updated':
+            $studentName = $_GET['name'] ?? 'el estudiante';
+            $cedula = $_GET['cedula'] ?? '';
+            $successMessage = "✏️ Estudiante <strong>" . htmlspecialchars($studentName) . "</strong> (Cédula: " . htmlspecialchars($cedula) . ") actualizado exitosamente.";
+            break;
+        case 'student_deleted':
+            $studentName = $_GET['name'] ?? 'el estudiante';
+            $cedula = $_GET['cedula'] ?? '';
+            $successMessage = "🗑️ Estudiante <strong>" . htmlspecialchars($studentName) . "</strong> (Cédula: " . htmlspecialchars($cedula) . ") eliminado exitosamente.";
+            break;
+    }
+}
+
 function mostrarTablaEstudiantes()
 {
     try {
@@ -82,7 +103,8 @@ function mostrarTablaEstudiantes()
             if ($isAdmin) {
                 echo '<td class="action-buttons">';
                 echo '<a href="students/edit.php?cedula=' . $cedula . '" class="btn btn-sm btn-warning me-1"><i class="fas fa-edit"></i> Editar</a>';
-                echo '<a href="students/delete.php?cedula=' . $cedula . '" class="btn btn-sm btn-danger" onclick="return confirm(\'¿Seguro que deseas eliminar este estudiante?\');"><i class="fas fa-trash"></i> Eliminar</a>';
+                // ELIMINADO EL onclick="return confirm()" - Ahora usa nuestro sistema de confirmación
+                echo '<a href="students/delete.php?cedula=' . $cedula . '" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Eliminar</a>';
                 echo '</td>';
             }
             
@@ -95,6 +117,14 @@ function mostrarTablaEstudiantes()
 
 <main class="services-main">
     <div class="container mt-4">
+        <!-- Mostrar mensaje de éxito si existe -->
+        <?php if (isset($successMessage)): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <?php echo $successMessage; ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <?php endif; ?>
+        
         <?php mostrarTablaEstudiantes(); ?>
     </div>
 </main>
@@ -118,6 +148,33 @@ function mostrarTablaEstudiantes()
 
 .student-radio {
     cursor: pointer;
+}
+
+/* Estilos para los mensajes de éxito */
+.alert-success {
+    border-left: 4px solid #28a745;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-success strong {
+    color: #155724;
+}
+
+/* Animación para el mensaje de éxito */
+.alert.fade.show {
+    animation: slideInFromTop 0.5s ease-out;
+}
+
+@keyframes slideInFromTop {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 </style>
 
@@ -159,18 +216,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Manejar clic en el botón de generar reporte
-    generateBtn.addEventListener('click', function() {
-        const selectedRadio = document.querySelector('.student-radio[data-selected="true"]');
-        
-        if (selectedRadio) {
-            // Hay un estudiante seleccionado - generar reporte individual
-            const cedula = selectedRadio.getAttribute('data-cedula');
-            window.open(`reports/estudiantes_fpdf.php?student_id=${cedula}`, '_blank');
-        } else {
-            // No hay selección - generar reporte completo
-            window.open('reports/estudiantes_fpdf.php', '_blank');
-        }
-    });
+    if (generateBtn) {
+        generateBtn.addEventListener('click', function() {
+            const selectedRadio = document.querySelector('.student-radio[data-selected="true"]');
+            
+            if (selectedRadio) {
+                // Hay un estudiante seleccionado - generar reporte individual
+                const cedula = selectedRadio.getAttribute('data-cedula');
+                window.open(`reports/estudiantes_fpdf.php?student_id=${cedula}`, '_blank');
+            } else {
+                // No hay selección - generar reporte completo
+                window.open('reports/estudiantes_fpdf.php', '_blank');
+            }
+        });
+    }
+    
+    // Auto-ocultar mensaje de éxito después de 5 segundos
+    const successAlert = document.querySelector('.alert-success');
+    if (successAlert) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(successAlert);
+            bsAlert.close();
+        }, 5000);
+    }
 });
 </script>
 

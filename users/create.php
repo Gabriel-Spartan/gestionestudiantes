@@ -1,8 +1,8 @@
 <?php
-// users/create.php - Formulario para crear usuarios (secretarias)
+// users/create.php - Formulario para crear usuarios con dominio @gestion.com
 $pageTitle = "Crear Usuario";
-include_once __DIR__ . '/../includes/header.php';  // Sube una carpeta
-include_once __DIR__ . '/../includes/nav.php';     // Sube una carpeta
+include_once __DIR__ . '/../includes/header.php';
+include_once __DIR__ . '/../includes/nav.php';
 
 // Verificar autenticación y permisos
 if (!isset($_SESSION['user_id'])) {
@@ -41,12 +41,12 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                         <i class="fas fa-user"></i> Nombre Completo *
                                     </label>
                                     <input type="text" 
-                                           class="form-control" 
-                                           id="nombre" 
-                                           name="nombre" 
-                                           required
-                                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
-                                           title="Solo se permiten letras y espacios">
+                                            class="form-control" 
+                                            id="nombre" 
+                                            name="nombre" 
+                                            required
+                                            pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                                            title="Solo se permiten letras y espacios">
                                     <div class="form-text">Solo letras y espacios, sin números ni símbolos</div>
                                 </div>
                             </div>
@@ -56,12 +56,20 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                     <label for="correo" class="form-label">
                                         <i class="fas fa-envelope"></i> Correo Electrónico *
                                     </label>
-                                    <input type="email" 
-                                           class="form-control" 
-                                           id="correo" 
-                                           name="correo" 
-                                           required>
-                                    <div class="form-text">Debe ser un email válido y único</div>
+                                    <div class="input-group">
+                                        <input type="text" 
+                                                class="form-control flex-grow-1" 
+                                                id="correoUsuario" 
+                                                name="correoUsuario" 
+                                                required
+                                                pattern="[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]|[a-zA-Z0-9]"
+                                                title="Solo letras, números, puntos y guiones. Debe empezar y terminar con letra o número"
+                                                placeholder="usuario"
+                                                style="min-width: 0; flex: 2;">
+                                        <span class="input-group-text bg-primary text-white fw-bold" style="flex: 0 0 auto; white-space: nowrap;">@gestion.com</span>
+                                    </div>
+                                    <div class="form-text">Solo letras, números, puntos y guiones. NO extensiones como .com, .net, etc.</div>
+                                    <input type="hidden" id="correo" name="correo">
                                 </div>
                             </div>
                         </div>
@@ -88,12 +96,12 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                     </label>
                                     <div class="input-group">
                                         <input type="password" 
-                                               class="form-control" 
-                                               id="contrasenia" 
-                                               name="contrasenia" 
-                                               required
-                                               minlength="6"
-                                               title="La contraseña debe tener al menos 6 caracteres">
+                                                class="form-control" 
+                                                id="contrasenia" 
+                                                name="contrasenia" 
+                                                required
+                                                minlength="6"
+                                                title="La contraseña debe tener al menos 6 caracteres">
                                         <button class="btn btn-outline-secondary" 
                                                 type="button" 
                                                 id="toggleNewPassword">
@@ -113,7 +121,7 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                     </label>
                                     <div class="alert alert-info mb-0">
                                         <small>
-                                            <strong>Nota:</strong> El usuario podrá cambiar su contraseña después del primer inicio de sesión.
+                                            <strong>Nota:</strong> Todos los usuarios tendrán correos con dominio @gestion.com.
                                         </small>
                                     </div>
                                 </div>
@@ -136,7 +144,7 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
     </div>
 </div>
 
-<!-- Modal para mostrar contraseña generada -->
+<!-- Modal para mostrar datos del usuario creado -->
 <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -154,15 +162,15 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                 <div class="card">
                     <div class="card-body">
                         <h6>Datos de acceso para el nuevo usuario:</h6>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-sm-4"><strong>Nombre:</strong></div>
                             <div class="col-sm-8" id="modalUserName"></div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-sm-4"><strong>Email:</strong></div>
                             <div class="col-sm-8" id="modalUserEmail"></div>
                         </div>
-                        <div class="row">
+                        <div class="row mb-2">
                             <div class="col-sm-4"><strong>Tipo:</strong></div>
                             <div class="col-sm-8" id="modalUserType"></div>
                         </div>
@@ -171,12 +179,13 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                             <div class="col-sm-8">
                                 <div class="input-group">
                                     <input type="password" 
-                                           class="form-control" 
-                                           id="modalPassword" 
-                                           readonly>
+                                            class="form-control" 
+                                            id="modalPassword" 
+                                            readonly>
                                     <button class="btn btn-outline-secondary" 
                                             type="button" 
-                                            id="togglePassword">
+                                            id="togglePassword"
+                                            title="Mostrar/Ocultar contraseña">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button class="btn btn-outline-primary" 
@@ -214,6 +223,73 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validación de nombre en tiempo real
     nombreInput.addEventListener('input', function() {
         this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+        
+        // Validación visual
+        this.classList.remove('is-valid', 'is-invalid');
+        if (this.value.trim().length >= 2) {
+            this.classList.add('is-valid');
+            showFieldFeedback(this, true);
+        } else if (this.value.length > 0) {
+            this.classList.add('is-invalid');
+            showFieldFeedback(this, false, 'Mínimo 2 caracteres');
+        }
+    });
+    
+    // Validación de correo en tiempo real y construcción automática
+    const correoUsuarioInput = document.getElementById('correoUsuario');
+    const correoHiddenInput = document.getElementById('correo');
+    
+    correoUsuarioInput.addEventListener('input', function() {
+        // Limpiar caracteres no válidos (solo letras, números, puntos, guiones)
+        let valor = this.value.replace(/[^a-zA-Z0-9._-]/g, '');
+        
+        // Evitar puntos, guiones al inicio
+        valor = valor.replace(/^[._-]+/, '');
+        
+        // Evitar puntos, guiones al final
+        valor = valor.replace(/[._-]+$/, '');
+        
+        // Evitar dobles puntos, guiones consecutivos
+        valor = valor.replace(/[._-]{2,}/g, function(match) {
+            return match[0];
+        });
+        
+        // Evitar patrones como .com, .net, .org, etc. (extensiones de dominio)
+        valor = valor.replace(/\.(com|net|org|edu|gov|mil|int|co|io|ly|me|tv|cc|biz|info|name|pro|aero|museum)$/gi, '');
+        
+        // Evitar @ y otros caracteres de email
+        valor = valor.replace(/[@]/g, '');
+        
+        // Limitar longitud
+        if (valor.length > 20) {
+            valor = valor.substring(0, 20);
+        }
+        
+        this.value = valor;
+        
+        // Construir email completo
+        const emailCompleto = valor ? valor + '@gestion.com' : '';
+        correoHiddenInput.value = emailCompleto;
+        
+        // Validación visual más estricta
+        this.classList.remove('is-valid', 'is-invalid');
+        if (valor.length >= 3 && /^[a-zA-Z0-9]/.test(valor) && /^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$/.test(valor)) {
+            this.classList.add('is-valid');
+            showFieldFeedback(this, true);
+        } else if (valor.length > 0) {
+            this.classList.add('is-invalid');
+            let mensaje = 'Formato inválido. ';
+            if (valor.length < 3) {
+                mensaje += 'Mínimo 3 caracteres. ';
+            }
+            if (!/^[a-zA-Z0-9]/.test(valor)) {
+                mensaje += 'Debe empezar con letra o número. ';
+            }
+            if (valor.length > 1 && !/[a-zA-Z0-9]$/.test(valor)) {
+                mensaje += 'Debe terminar con letra o número.';
+            }
+            showFieldFeedback(this, false, mensaje.trim());
+        }
     });
     
     // Validación de contraseña en tiempo real
@@ -226,9 +302,40 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (password.length >= minLength) {
             this.classList.add('is-valid');
+            showFieldFeedback(this, true);
         } else if (password.length > 0) {
             this.classList.add('is-invalid');
+            showFieldFeedback(this, false, 'Mínimo 6 caracteres');
         }
+    });
+    
+    // Función para mostrar feedback visual en campos
+    function showFieldFeedback(input, isValid, message = '') {
+        // Buscar feedback existente
+        let feedbackDiv = input.parentNode.querySelector('.invalid-feedback');
+        
+        if (isValid) {
+            if (feedbackDiv) feedbackDiv.remove();
+        } else {
+            if (!feedbackDiv && message) {
+                feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'invalid-feedback';
+                feedbackDiv.textContent = message;
+                input.parentNode.appendChild(feedbackDiv);
+            } else if (feedbackDiv && message) {
+                feedbackDiv.textContent = message;
+            }
+        }
+    }
+    
+    // Botones de sugerencias de usuario
+    document.querySelectorAll('.suggestion-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const usuario = this.getAttribute('data-usuario');
+            correoUsuarioInput.value = usuario;
+            correoUsuarioInput.dispatchEvent(new Event('input')); // Disparar validación
+            correoUsuarioInput.focus();
+        });
     });
     
     // Toggle para mostrar/ocultar contraseña nueva
@@ -249,6 +356,13 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
+        // Validar que el correo esté completo
+        if (!correoHiddenInput.value || !correoHiddenInput.value.includes('@gestion.com')) {
+            showAlert('danger', 'Por favor, complete el campo de correo electrónico.');
+            correoUsuarioInput.focus();
+            return;
+        }
+        
         // Cambiar estado del botón
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
@@ -260,6 +374,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Obtener datos del formulario
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
+            
+            // Asegurar que se envía el correo completo
+            data.correo = correoHiddenInput.value;
+            
+            console.log('Datos a enviar:', data);
             
             // Enviar solicitud a la API
             const response = await fetch('../api/users/create.php', {
@@ -277,30 +396,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('modalUserName').textContent = result.data.nombre;
                 document.getElementById('modalUserEmail').textContent = result.data.correo;
                 document.getElementById('modalUserType').textContent = result.data.tipo;
+                document.getElementById('modalPassword').value = result.data.password_display || data.contrasenia;
                 
-                // Mostrar contraseña configurada (no la temporal)
-                document.getElementById('modalPassword').value = result.data.password_display || '••••••••';
-                
-                // Cambiar el texto del modal si se usó contraseña personalizada
-                const alertElement = document.querySelector('#passwordModal .alert-warning');
-                if (result.data.password_type === 'custom') {
-                    alertElement.innerHTML = `
-                        <i class="fas fa-info-circle"></i>
-                        <strong>Información:</strong> Se ha configurado la contraseña personalizada para el usuario.
-                    `;
-                    alertElement.className = 'alert alert-info';
-                } else {
-                    alertElement.innerHTML = `
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>¡Importante!</strong> Guarde esta información de forma segura. La contraseña no se volverá a mostrar.
-                    `;
-                }
-                
-                // Mostrar modal sin Bootstrap
+                // Mostrar modal
                 showModal();
                 
                 // Limpiar formulario
                 form.reset();
+                correoHiddenInput.value = '';
                 
             } else {
                 // Mostrar errores
@@ -402,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Toggle mostrar/ocultar contraseña
+    // Toggle mostrar/ocultar contraseña en modal
     document.getElementById('togglePassword').addEventListener('click', function() {
         const passwordInput = document.getElementById('modalPassword');
         const icon = this.querySelector('i');
@@ -430,11 +533,75 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             icon.className = originalClass;
         }, 1000);
+        
+        // Mostrar mensaje temporal
+        const button = this;
+        const originalTitle = button.title;
+        button.title = '¡Copiado!';
+        setTimeout(() => {
+            button.title = originalTitle;
+        }, 2000);
     });
 });
 </script>
 
 <style>
+/* Estilos para el campo de correo con dominio fijo */
+.input-group {
+    display: flex;
+    width: 100%;
+}
+
+.input-group-text {
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 0.375rem 0.5rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+#correoUsuario {
+    flex: 2 1 auto;
+    min-width: 120px;
+    font-size: 1rem;
+    padding: 0.375rem 0.75rem;
+}
+
+#correoUsuario:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    z-index: 3;
+}
+
+#correoUsuario:focus + .input-group-text {
+    border-color: #86b7fe;
+}
+
+/* Responsive: En pantallas pequeñas, ajustar aún más */
+@media (max-width: 576px) {
+    .input-group-text {
+        font-size: 0.8rem;
+        padding: 0.375rem 0.4rem;
+    }
+    
+    #correoUsuario {
+        min-width: 100px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Estilos para botones de sugerencias */
+.suggestion-btn {
+    border-radius: 20px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.suggestion-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* Estilos para el modal manual */
 .modal {
     display: none;
@@ -512,6 +679,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 .alert {
     border-radius: 0.5rem;
+}
+
+/* Validación visual mejorada */
+.is-valid {
+    border-color: #28a745;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsivo para móviles */
+@media (max-width: 768px) {
+    .d-flex.flex-wrap.gap-2 {
+        flex-direction: column;
+    }
+    
+    .suggestion-btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
 }
 </style>
 
