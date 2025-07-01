@@ -41,12 +41,12 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                         <i class="fas fa-user"></i> Nombre Completo *
                                     </label>
                                     <input type="text" 
-                                            class="form-control" 
-                                            id="nombre" 
-                                            name="nombre" 
-                                            required
-                                            pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
-                                            title="Solo se permiten letras y espacios">
+                                           class="form-control" 
+                                           id="nombre" 
+                                           name="nombre" 
+                                           required
+                                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+"
+                                           title="Solo se permiten letras y espacios">
                                     <div class="form-text">Solo letras y espacios, sin números ni símbolos</div>
                                 </div>
                             </div>
@@ -58,14 +58,14 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                     </label>
                                     <div class="input-group">
                                         <input type="text" 
-                                                class="form-control flex-grow-1" 
-                                                id="correoUsuario" 
-                                                name="correoUsuario" 
-                                                required
-                                                pattern="[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]|[a-zA-Z0-9]"
-                                                title="Solo letras, números, puntos y guiones. Debe empezar y terminar con letra o número"
-                                                placeholder="usuario"
-                                                style="min-width: 0; flex: 2;">
+                                               class="form-control flex-grow-1" 
+                                               id="correoUsuario" 
+                                               name="correoUsuario" 
+                                               required
+                                               pattern="[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]|[a-zA-Z0-9]"
+                                               title="Solo letras, números, puntos y guiones. Debe empezar y terminar con letra o número"
+                                               placeholder="usuario"
+                                               style="min-width: 0; flex: 2;">
                                         <span class="input-group-text bg-primary text-white fw-bold" style="flex: 0 0 auto; white-space: nowrap;">@gestion.com</span>
                                     </div>
                                     <div class="form-text">Solo letras, números, puntos y guiones. NO extensiones como .com, .net, etc.</div>
@@ -96,19 +96,37 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                     </label>
                                     <div class="input-group">
                                         <input type="password" 
-                                                class="form-control" 
-                                                id="contrasenia" 
-                                                name="contrasenia" 
-                                                required
-                                                minlength="6"
-                                                title="La contraseña debe tener al menos 6 caracteres">
+                                               class="form-control" 
+                                               id="contrasenia" 
+                                               name="contrasenia" 
+                                               required
+                                               minlength="6"
+                                               title="La contraseña debe tener al menos 6 caracteres (se actualizará según configuración)">
                                         <button class="btn btn-outline-secondary" 
                                                 type="button" 
                                                 id="toggleNewPassword">
                                             <i class="fas fa-eye"></i>
                                         </button>
                                     </div>
-                                    <div class="form-text">Mínimo 6 caracteres. El usuario podrá cambiarla después.</div>
+                                    <div class="form-text">Mínimo 6 caracteres (se actualizará según configuración). El usuario podrá cambiarla después.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ejemplos de usuarios sugeridos -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">
+                                        <i class="fas fa-lightbulb"></i> Ejemplos de correos sugeridos
+                                    </label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button type="button" class="btn btn-outline-info btn-sm suggestion-btn" data-usuario="admin">admin@gestion.com</button>
+                                        <button type="button" class="btn btn-outline-info btn-sm suggestion-btn" data-usuario="secretaria">secretaria@gestion.com</button>
+                                        <button type="button" class="btn btn-outline-info btn-sm suggestion-btn" data-usuario="secretaria1">secretaria1@gestion.com</button>
+                                        <button type="button" class="btn btn-outline-info btn-sm suggestion-btn" data-usuario="recepcion">recepcion@gestion.com</button>
+                                    </div>
+                                    <div class="form-text">Haga clic en un ejemplo para autocompletar</div>
                                 </div>
                             </div>
                         </div>
@@ -121,7 +139,9 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                                     </label>
                                     <div class="alert alert-info mb-0">
                                         <small>
-                                            <strong>Nota:</strong> Todos los usuarios tendrán correos con dominio @gestion.com.
+                                            <strong>Configuración de seguridad:</strong><br>
+                                            • Cargando configuración desde base de datos...<br>
+                                            • Dominio de correo: @gestion.com
                                         </small>
                                     </div>
                                 </div>
@@ -179,9 +199,9 @@ if ($_SESSION['user_type'] !== 'ADMIN') {
                             <div class="col-sm-8">
                                 <div class="input-group">
                                     <input type="password" 
-                                            class="form-control" 
-                                            id="modalPassword" 
-                                            readonly>
+                                           class="form-control" 
+                                           id="modalPassword" 
+                                           readonly>
                                     <button class="btn btn-outline-secondary" 
                                             type="button" 
                                             id="togglePassword"
@@ -219,6 +239,70 @@ document.addEventListener('DOMContentLoaded', function() {
     const alertContainer = document.getElementById('alertContainer');
     const nombreInput = document.getElementById('nombre');
     const contraseniaInput = document.getElementById('contrasenia');
+    
+    // Variables para configuración de seguridad
+    let securityConfig = {
+        longitud_minima_password: { valor: '6' }, // Valor por defecto
+        max_intentos_login: { valor: '5' },
+        tiempo_bloqueo_minutos: { valor: '30' }
+    };
+    
+    // Cargar configuración de seguridad al iniciar
+    loadSecurityConfig();
+    
+    async function loadSecurityConfig() {
+        try {
+            const response = await fetch('../api/config/security.php');
+            const result = await response.json();
+            
+            if (result.success) {
+                securityConfig = result.data;
+                console.log('Configuración de seguridad cargada:', securityConfig);
+                
+                // Actualizar validaciones basadas en la configuración
+                updatePasswordValidation();
+                updateFormTexts();
+            } else {
+                console.warn('Error al cargar configuración:', result.message);
+                // Usar valores por defecto
+            }
+        } catch (error) {
+            console.error('Error al cargar configuración de seguridad:', error);
+            // Usar valores por defecto
+        }
+    }
+    
+    function updatePasswordValidation() {
+        const minLength = parseInt(securityConfig.longitud_minima_password.valor);
+        
+        // Actualizar atributos del input
+        contraseniaInput.setAttribute('minlength', minLength);
+        contraseniaInput.setAttribute('title', `La contraseña debe tener al menos ${minLength} caracteres`);
+        
+        // Actualizar el texto de ayuda
+        const helpText = contraseniaInput.parentNode.nextElementSibling;
+        if (helpText && helpText.classList.contains('form-text')) {
+            helpText.textContent = `Mínimo ${minLength} caracteres. El usuario podrá cambiarla después.`;
+        }
+    }
+    
+    function updateFormTexts() {
+        // Actualizar información de seguridad
+        const infoAlert = document.querySelector('.alert-info small');
+        if (infoAlert) {
+            const minLength = securityConfig.longitud_minima_password.valor;
+            const maxIntentos = securityConfig.max_intentos_login.valor;
+            const tiempoBloqueo = securityConfig.tiempo_bloqueo_minutos.valor;
+            
+            infoAlert.innerHTML = `
+                <strong>Configuración de seguridad:</strong><br>
+                • Longitud mínima de contraseña: ${minLength} caracteres<br>
+                • Intentos máximos de login: ${maxIntentos}<br>
+                • Tiempo de bloqueo: ${tiempoBloqueo} minutos<br>
+                • Dominio de correo: @gestion.com
+            `;
+        }
+    }
     
     // Validación de nombre en tiempo real
     nombreInput.addEventListener('input', function() {
@@ -292,10 +376,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Validación de contraseña en tiempo real
+    // Validación de contraseña en tiempo real (usando configuración dinámica)
     contraseniaInput.addEventListener('input', function() {
         const password = this.value;
-        const minLength = 6;
+        const minLength = parseInt(securityConfig.longitud_minima_password.valor);
         
         // Remover clases previas
         this.classList.remove('is-valid', 'is-invalid');
@@ -305,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showFieldFeedback(this, true);
         } else if (password.length > 0) {
             this.classList.add('is-invalid');
-            showFieldFeedback(this, false, 'Mínimo 6 caracteres');
+            showFieldFeedback(this, false, `Mínimo ${minLength} caracteres`);
         }
     });
     

@@ -319,7 +319,7 @@ if (!in_array($_SESSION['user_type'] ?? '', ['ADMIN', 'SECRETARIA'])) {
             <button type="submit" class="btn btn-success">
                 💾 Guardar Estudiante
             </button>
-            <a href="student.php" class="btn btn-secondary">
+            <a href="../dashboard.php" class="btn btn-secondary">
                 ↩️ Cancelar
             </a>
         </div>

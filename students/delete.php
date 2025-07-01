@@ -118,11 +118,9 @@ if (!$confirmado) {
                             </div>
                             
                             <div class="mt-4 d-flex justify-content-center gap-3">
-                                <a href="delete.php?cedula=<?php echo urlencode($cedula); ?>&confirmado=si" 
-                                   class="btn btn-danger btn-lg"
-                                   id="confirmarEliminacion">
+                                <button type="button" class="btn btn-danger btn-lg" id="confirmarEliminacion">
                                     🗑️ Sí, Eliminar Definitivamente
-                                </a>
+                                </button>
                                 <a href="../dashboard.php" class="btn btn-success btn-lg">
                                     ❌ No, Cancelar
                                 </a>
@@ -140,28 +138,31 @@ if (!$confirmado) {
             </div>
         </div>
 
-        <!-- Modal de confirmación adicional -->
-        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-danger">
-                    <div class="modal-header bg-danger text-white">
-                        <h5 class="modal-title" id="confirmModalLabel">⚠️ Confirmación Final</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Modal de confirmación final - HTML puro sin Bootstrap -->
+        <div id="confirmModal" class="custom-modal" style="display: none;">
+            <div class="modal-overlay">
+                <div class="modal-content-custom">
+                    <div class="modal-header-custom">
+                        <h5>⚠️ Confirmación Final</h5>
+                        <button type="button" class="close-modal" onclick="closeConfirmModal()">&times;</button>
                     </div>
-                    <div class="modal-body text-center">
-                        <div class="mb-3">
-                            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                    <div class="modal-body-custom">
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <span style="font-size: 3rem; color: #ffc107;">⚠️</span>
+                            </div>
+                            <h5 class="text-danger">¿Estás absolutamente seguro?</h5>
+                            <p class="mb-3">El estudiante <strong><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido']); ?></strong> será eliminado permanentemente.</p>
+                            <p class="text-muted small">Esta acción no se puede deshacer.</p>
                         </div>
-                        <h5 class="text-danger">¿Estás absolutamente seguro?</h5>
-                        <p class="mb-3">El estudiante <strong><?php echo htmlspecialchars($estudiante['nombre'] . ' ' . $estudiante['apellido']); ?></strong> será eliminado permanentemente.</p>
-                        <p class="text-muted small">Esta acción no se puede deshacer.</p>
                     </div>
-                    <div class="modal-footer justify-content-center">
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">
+                    <div class="modal-footer-custom">
+                        <button type="button" class="btn btn-success" onclick="closeConfirmModal()">
                             ❌ Cancelar
                         </button>
                         <a href="delete.php?cedula=<?php echo urlencode($cedula); ?>&confirmado=si" 
-                           class="btn btn-danger">
+                           class="btn btn-danger"
+                           onclick="showLoadingMessage()">
                             🗑️ Eliminar Definitivamente
                         </a>
                     </div>
@@ -173,29 +174,139 @@ if (!$confirmado) {
         .student-info .row {
             margin-bottom: 0.5rem;
         }
-        .card-border-danger {
-            border-color: #dc3545 !important;
-        }
         .gap-3 {
             gap: 1rem !important;
         }
+
+        /* Modal personalizado */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1050;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-overlay {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding: 1rem;
+        }
+
+        .modal-content-custom {
+            background: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border: 2px solid #dc3545;
+        }
+
+        .modal-header-custom {
+            background: #dc3545;
+            color: white;
+            padding: 1rem;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header-custom h5 {
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-body-custom {
+            padding: 1.5rem;
+        }
+
+        .modal-footer-custom {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        /* Mensaje de carga */
+        .loading-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            z-index: 2000;
+            display: none;
+        }
         </style>
 
+        <!-- Mensaje de carga -->
+        <div id="loadingMessage" class="loading-message">
+            <div class="text-center">
+                <div class="spinner-border text-light" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <div class="mt-2">Eliminando estudiante...</div>
+            </div>
+        </div>
+
         <script>
+        function showConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Prevenir scroll
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restaurar scroll
+        }
+
+        function showLoadingMessage() {
+            document.getElementById('loadingMessage').style.display = 'block';
+            closeConfirmModal();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const confirmarBtn = document.getElementById('confirmarEliminacion');
             
             confirmarBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
-                // Mostrar modal de confirmación adicional
-                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-                modal.show();
+                showConfirmModal();
             });
-            
-            // Auto-focus en el botón de cancelar cuando se abre el modal
-            document.getElementById('confirmModal').addEventListener('shown.bs.modal', function() {
-                document.querySelector('[data-bs-dismiss="modal"]').focus();
+
+            // Cerrar modal con ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeConfirmModal();
+                }
+            });
+
+            // Cerrar modal haciendo clic fuera
+            document.getElementById('confirmModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeConfirmModal();
+                }
             });
         });
         </script>

@@ -33,9 +33,9 @@ if (isset($_SESSION['user_id'])) {
                     <button type="button" id="togglePassword" class="toggle-password" aria-label="Mostrar/Ocultar contraseña"></button>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label class="checkbox-wrapper">
-                        <input type="checkbox" id="remember" name="remember">
+                        <input type="checkbox" id="remember" name="remember" checked>
                         <span class="checkmark"></span>
                         Recordar sesión
                     </label>
